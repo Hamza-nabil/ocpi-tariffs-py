@@ -110,30 +110,48 @@ def calculate_cdr_cost(cdr: Cdr, tariff: Tariff) -> Price:
                 last_components["ENERGY"] = component
                 
             elif component.type == TariffDimensionType.TIME:
-                # Check if we have explicit PARKING_TIME dimension
-                parking_vol = _get_dimension_volume(period, CdrDimensionType.PARKING_TIME)
-                if parking_vol > 0:
-                     continue # verified later
+                # Use volume from dimension if available
+                vol = _get_dimension_volume(period, CdrDimensionType.TIME)
+                
+                # Fallback only if this is NOT a parking period
+                if vol == 0:
+                     parking_check = _get_dimension_volume(period, CdrDimensionType.PARKING_TIME)
+                     if parking_check == 0:
+                         vol = duration_hours
+                     else:
+                         # It is a parking period, so Time tariff does not apply
+                         vol = Decimal("0.00")
 
-                cost = duration_hours * component.price
-                total_dimensions["TIME"] += duration_hours
+                cost = vol * component.price
+                total_dimensions["TIME"] += vol
                 last_components["TIME"] = component
 
             elif component.type == TariffDimensionType.PARKING_TIME:
                  # Check if this period is parking
-                 # If explicit parking dimension is there
-                 parking_vol = _get_dimension_volume(period, CdrDimensionType.PARKING_TIME)
-                 if parking_vol > 0:
-                     # Use calculated duration for consistency with TIME
-                     cost = duration_hours * component.price
-                     total_dimensions["PARKING_TIME"] += duration_hours
-                     last_components["PARKING_TIME"] = component
+                 vol = _get_dimension_volume(period, CdrDimensionType.PARKING_TIME)
+                 
+                 # Strict matching: If no PARKING_TIME dimension, do not apply Parking Tariff
+                 # unless we are sure (e.g. pure duration-based without dimensions?).
+                 # But safer to require dimension or infer from lack of TIME?
+                 # For now, strict:
+                 cost = vol * component.price
+                 total_dimensions["PARKING_TIME"] += vol
+                 last_components["PARKING_TIME"] = component
             
             total_cost_excl_vat += cost
             total_vat += cost * (vat_rate / Decimal("100"))
 
     # Apply Step Size Logic (Add cost for rounded-up remainder)
+    # Spec "Combined" Rule: "In the cases that TIME and PARKING_TIME ... are both used, step_size is only taken into account for the total parking duration"
+    
+    has_time = total_dimensions["TIME"] > 0
+    has_parking = total_dimensions["PARKING_TIME"] > 0
+
     for dim_key, total_raw in total_dimensions.items():
+        # Skip TIME step size if we have both TIME and PARKING
+        if dim_key == "TIME" and has_time and has_parking:
+            continue
+
         comp = last_components[dim_key]
         if comp and comp.step_size > 0:
             step_size_unit = Decimal(comp.step_size)
@@ -150,7 +168,8 @@ def calculate_cdr_cost(cdr: Cdr, tariff: Tariff) -> Price:
                 total_rounded = Decimal(steps) * step_size_unit
                 remainder = total_rounded - total_raw
                 
-                if remainder > 0:
+                # Check for precision issues with small remainders?
+                if remainder > Decimal("1e-9"):
                     cost = remainder * comp.price
                     vat_rate = comp.vat if comp.vat is not None else Decimal("0.00")
                     total_cost_excl_vat += cost
@@ -194,9 +213,11 @@ def _check_restrictions(restrictions: Optional[dict], period: ChargingPeriod, se
          # Best effort: use string format of the datetime provided.
          period_time_str = period.start_date_time.strftime("%H:%M")
          
+         
          if restrictions.start_time and period_time_str < restrictions.start_time:
              return False
-         if restrictions.end_time and period_time_str > restrictions.end_time:
+         # End Time is exclusive (e.g. up to 17:00 means < 17:00)
+         if restrictions.end_time and period_time_str >= restrictions.end_time:
              return False
 
     # 3. Start Date / End Date
