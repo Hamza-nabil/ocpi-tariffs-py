@@ -1,10 +1,12 @@
 from enum import Enum
 
+
 class TariffDimensionType(str, Enum):
     ENERGY = "ENERGY"
     FLAT = "FLAT"
     PARKING_TIME = "PARKING_TIME"
     TIME = "TIME"
+
 
 class CdrDimensionType(str, Enum):
     CURRENT = "CURRENT"
@@ -21,10 +23,12 @@ class CdrDimensionType(str, Enum):
     STATE_OF_CHARGE = "STATE_OF_CHARGE"
     TIME = "TIME"
 
+
 class AuthMethod(str, Enum):
     AUTH_REQUEST = "AUTH_REQUEST"
     COMMAND = "COMMAND"
     WHITELIST = "WHITELIST"
+
 
 class SessionStatus(str, Enum):
     ACTIVE = "ACTIVE"
