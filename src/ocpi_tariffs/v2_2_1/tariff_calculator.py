@@ -218,10 +218,7 @@ def _get_dimension_volume(period: ChargingPeriod, dim_type: CdrDimensionType) ->
 
 
 def _find_active_element(
-    tariff: Tariff,
-    period: ChargingPeriod,
-    session_duration_hours: Decimal,
-    country_code: Optional[str] = None
+    tariff: Tariff, period: ChargingPeriod, session_duration_hours: Decimal, country_code: Optional[str] = None
 ) -> Optional[TariffElement]:
     # 2. Iterate elements and check restrictions
     for element in tariff.elements:

@@ -47,26 +47,24 @@ def test_json(cdr_path: str) -> None:
 
     if expected_cost:
         # Helper to compare decimals with tolerance
-         def loose_equal(a: Optional[Decimal], b: Optional[Decimal]) -> bool:
-             if a is None and b is None:
-                 return True
-             if a is None or b is None:
-                 return False
-             # Allow 0.02 difference (2 cents) to account for VAT rounding amplification
-             return abs(a - b) <= Decimal("0.02")
+        def loose_equal(a: Optional[Decimal], b: Optional[Decimal]) -> bool:
+            if a is None and b is None:
+                return True
+            if a is None or b is None:
+                return False
+            # Allow 0.02 difference (2 cents) to account for VAT rounding amplification
+            return abs(a - b) <= Decimal("0.02")
 
-         # If strict equality fails, try rounded equality
-         if calculated_cost != expected_cost:
-              matches_excl = loose_equal(calculated_cost.excl_vat, expected_cost.excl_vat)
-              matches_incl = loose_equal(calculated_cost.incl_vat, expected_cost.incl_vat)
+        # If strict equality fails, try rounded equality
+        if calculated_cost != expected_cost:
+            matches_excl = loose_equal(calculated_cost.excl_vat, expected_cost.excl_vat)
+            matches_incl = loose_equal(calculated_cost.incl_vat, expected_cost.incl_vat)
 
-              if matches_excl and matches_incl:
-                   return # Pass
+            if matches_excl and matches_incl:
+                return  # Pass
 
-              # If rounding didn't help, fail with original values
-              assert calculated_cost == expected_cost, (
-                f"Expected {expected_cost}, got {calculated_cost}"
-              )
+            # If rounding didn't help, fail with original values
+            assert calculated_cost == expected_cost, f"Expected {expected_cost}, got {calculated_cost}"
 
 
 if __name__ == "__main__":
