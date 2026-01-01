@@ -8,7 +8,7 @@ from ocpi_tariffs.v2_2_1.models import Cdr, Tariff
 def read_json(file_path):
     path = Path(file_path)
     if not path.exists():
-        pytest.skip(f"Test data file not found: {file_path}")
+        return None
     with open(path, "r") as f:
         return json.load(f)
 
@@ -27,7 +27,10 @@ def test_json(cdr_path):
     cdr_data = read_json(cdr_path)
     tariff_data = read_json(tariff_path)
     cdr = Cdr(**cdr_data)
-    tariff = Tariff(**tariff_data)
+    if tariff_data is None:
+        tariff = None
+    else:
+        tariff = Tariff(**tariff_data)
 
     calculated_cost = calculate_cdr_cost(cdr=cdr, tariff=tariff)
 

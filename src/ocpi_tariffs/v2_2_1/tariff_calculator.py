@@ -1,16 +1,52 @@
 from decimal import Decimal
 from typing import List, Optional, Dict
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 import math
 
 from .models import Cdr, Tariff, TariffElement, PriceComponent, Price, ChargingPeriod
 from .enums import TariffDimensionType, CdrDimensionType
 
+TIMEZONE_MAP = {
+    "NL": "Europe/Amsterdam",
+    "NLD": "Europe/Amsterdam",
+    "DE": "Europe/Berlin",
+    "DEU": "Europe/Berlin",
+    "BE": "Europe/Brussels",
+    "BEL": "Europe/Brussels",
+    "FR": "Europe/Paris",
+    "FRA": "Europe/Paris",
+    "GB": "Europe/London",
+    "GBR": "Europe/London",
+    "UK": "Europe/London",
+    # Add others as needed
+}
 
-def calculate_cdr_cost(cdr: Cdr, tariff: Tariff) -> Price:
+def _get_local_time(dt, country_code: Optional[str]):
+    if not country_code:
+        return dt
+    
+    tz_name = TIMEZONE_MAP.get(country_code.upper())
+    if tz_name:
+        try:
+            return dt.astimezone(ZoneInfo(tz_name))
+        except Exception:
+            pass
+    return dt
+
+
+def calculate_cdr_cost(cdr: Cdr, tariff: Optional[Tariff] = None) -> Price:
     """
     Calculates the total cost of a CDR based on the provided Tariff.
+    If no tariff is provided, it attempts to use the first tariff found in the CDR.
     """
+    # Fallback to CDR tarffs if provided tariff is None
+    if tariff is None:
+        if cdr.tariffs and len(cdr.tariffs) > 0:
+            tariff = cdr.tariffs[0]
+        else:
+            raise ValueError("No tariff provided and no tariffs found in CDR.")
+
     total_cost_excl_vat = Decimal("0.00")
     total_vat = Decimal("0.00")
 
@@ -83,8 +119,10 @@ def calculate_cdr_cost(cdr: Cdr, tariff: Tariff) -> Price:
         
         # We scan all elements. If it matches restrictions, we grab its components IF we haven't covered that dimension yet.
         # This is "Layered" matching.
+        country_code = cdr.cdr_location.country if cdr.cdr_location else None
+        
         for element in tariff.elements:
-             if _check_restrictions(element.restrictions, period, session_duration_hours):
+             if _check_restrictions(element.restrictions, period, session_duration_hours, country_code):
                  for comp in element.price_components:
                      if comp.type not in covered_dims:
                          active_components.append(comp)
@@ -186,33 +224,32 @@ def _get_dimension_volume(period: ChargingPeriod, dim_type: CdrDimensionType) ->
             return dim.volume
     return Decimal("0.00")
 
-def _find_active_element(tariff: Tariff, period: ChargingPeriod, session_duration_hours: Decimal) -> Optional[TariffElement]:
+def _find_active_element(tariff: Tariff, period: ChargingPeriod, session_duration_hours: Decimal, country_code: Optional[str] = None) -> Optional[TariffElement]:
     # 2. Iterate elements and check restrictions
     for element in tariff.elements:
-        if _check_restrictions(element.restrictions, period, session_duration_hours):
+        if _check_restrictions(element.restrictions, period, session_duration_hours, country_code):
             return element
             
     return None
 
-def _check_restrictions(restrictions: Optional[dict], period: ChargingPeriod, session_duration_hours: Decimal) -> bool:
+def _check_restrictions(restrictions: Optional[dict], period: ChargingPeriod, session_duration_hours: Decimal, country_code: Optional[str] = None) -> bool:
     if not restrictions:
         return True
     
+    # Calculate Local Time once
+    local_dt = _get_local_time(period.start_date_time, country_code)
+
     # 1. Day of Week
     if restrictions.day_of_week:
         # Get day of week from period start (0=Monday, 6=Sunday) -> spec: "MONDAY", "TUESDAY", etc.
-        current_day_iso = period.start_date_time.strftime("%A").upper()
+        current_day_iso = local_dt.strftime("%A").upper()
         if current_day_iso not in restrictions.day_of_week:
             return False
 
     # 2. Start Time / End Time
     if restrictions.start_time or restrictions.end_time:
          # Local string comparison "HH:MM"
-         # We need to extract HH:MM from period start time (converted to local? Spec says Location/EVSE timezone).
-         # Without timezone info, we assume the string matches or use UTC if naive. 
-         # Best effort: use string format of the datetime provided.
-         period_time_str = period.start_date_time.strftime("%H:%M")
-         
+         period_time_str = local_dt.strftime("%H:%M")
          
          if restrictions.start_time and period_time_str < restrictions.start_time:
              return False
@@ -222,7 +259,7 @@ def _check_restrictions(restrictions: Optional[dict], period: ChargingPeriod, se
 
     # 3. Start Date / End Date
     if restrictions.start_date or restrictions.end_date:
-        period_date_str = period.start_date_time.strftime("%Y-%m-%d")
+        period_date_str = local_dt.strftime("%Y-%m-%d")
         if restrictions.start_date and period_date_str < restrictions.start_date:
             return False
         if restrictions.end_date and period_date_str > restrictions.end_date:

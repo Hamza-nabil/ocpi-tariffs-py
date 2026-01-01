@@ -49,6 +49,26 @@ class CdrDimension(BaseModel):
     type: CdrDimensionType
     volume: Decimal
 
+class GeoLocation(BaseModel):
+    latitude: str
+    longitude: str
+
+class CdrLocation(BaseModel):
+    id: Optional[str] = None
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    postal_code: Optional[str] = None
+    state: Optional[str] = None 
+    country: str
+    coordinates: Optional[GeoLocation] = None
+    evse_uid: Optional[str] = None
+    evse_id: Optional[str] = None
+    connector_id: Optional[str] = None
+    connector_standard: Optional[str] = None
+    connector_format: Optional[str] = None
+    connector_power_type: Optional[str] = None
+
 class ChargingPeriod(BaseModel):
     start_date_time: datetime
     dimensions: List[CdrDimension]
@@ -59,6 +79,7 @@ class Cdr(BaseModel):
     start_date_time: datetime
     end_date_time: datetime
     currency: str
+    cdr_location: CdrLocation
     tariffs: List[Tariff] = Field(default_factory=list)
     charging_periods: List[ChargingPeriod]
     total_cost: Optional[Price] = None
