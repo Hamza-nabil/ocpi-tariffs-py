@@ -1,0 +1,6 @@
+{
+  "warnings": {
+    "$.country_code": ["cpo_country_code_should_be_alpha2", "country.invalid_case"],
+    "$.currency": ["currency.invalid_case"]
+  }
+}

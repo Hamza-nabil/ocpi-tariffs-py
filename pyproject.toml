@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ocpi-tariffs"
+version = "0.1.0"
+description = "OCPI 2.2.1 Tariff Calculation Engine"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ocpi_tariffs"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

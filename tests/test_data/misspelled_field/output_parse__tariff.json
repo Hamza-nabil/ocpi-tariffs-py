@@ -1,0 +1,8 @@
+{
+  "unexpected_fields": [
+    // The field should be called "day_of_week".
+    "$.elements.*.restrictions.dayOfWeek",
+    // Each day field in the `daysOfWeek` is considered unexpected.
+    "$.elements.*.restrictions.dayOfWeek.*",
+  ]
+}

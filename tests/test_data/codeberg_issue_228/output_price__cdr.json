@@ -1,0 +1,16 @@
+{
+  "cdr_price": {
+    "warnings": ["periods_outside_start_end_date_time"],
+    "total_cost": {
+      "excl_vat": "1.84",
+      "incl_vat": "2.22"
+    },
+    # The CDRs periods starts 20 mins and 6 secs before the time recorded in
+    # `start_date_time`.
+    "total_time": "1.0919",
+    "total_energy_cost": {
+      "excl_vat": "1.84",
+      "incl_vat": "2.22"
+    },
+  }
+}

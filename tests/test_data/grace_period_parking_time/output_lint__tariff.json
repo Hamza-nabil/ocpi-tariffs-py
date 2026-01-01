@@ -1,0 +1,5 @@
+{
+  "warnings": {
+    "$": ["required_field.country_code"]
+  }
+}

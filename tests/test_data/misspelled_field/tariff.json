@@ -1,0 +1,43 @@
+{
+  "country_code": "gbr",
+  "party_id": "OSP",
+  "id": "TDR1",
+  "currency": "gbp",
+  "elements": [
+    {
+      "price_components": [
+        {
+          "type": "ENERGY",
+          "price": 0.79,
+          "vat": 20.0,
+          "step_size": 1
+        }
+      ],
+      "restrictions": {
+        "dayOfWeek": [
+          "MONDAY",
+          "TUESDAY",
+          "WEDNESDAY",
+          "THURSDAY",
+          "FRIDAY"
+        ]
+      }
+    },
+    {
+      "price_components": [
+        {
+          "type": "ENERGY",
+          "price": 0.65,
+          "vat": 20.0,
+          "step_size": 1
+        }
+      ],
+      "restrictions": {
+        "dayOfWeek": [
+          "SATURDAY",
+          "SUNDAY"
+        ]
+      }
+    }
+  ]
+}
