@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "ocpi-tariffs"
 version = "0.1.0"
-description = "OCPI 2.2.1 Tariff Calculation Engine"
+description = "OCPI Tariff Calculation Engine"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
