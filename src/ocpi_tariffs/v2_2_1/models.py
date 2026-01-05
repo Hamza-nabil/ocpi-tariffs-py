@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from .enums import CdrDimensionType, TariffDimensionType
+from ocpi_tariffs.core.enums import CdrDimensionType, TariffDimensionType
 
 
 class Price(BaseModel):

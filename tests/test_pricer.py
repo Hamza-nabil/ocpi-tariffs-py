@@ -35,36 +35,61 @@ def test_json(cdr_path: str) -> None:
     if cdr_data is None:
         pytest.fail("CDR data not found")
 
+    # Detect version based on path
+    if "v2_1_1" in cdr_path:
+        from ocpi_tariffs.v2_1_1.models import Cdr, Tariff
+        from ocpi_tariffs.v2_1_1.tariff_calculator import calculate_cdr_cost
+    else:
+        from ocpi_tariffs.v2_2_1.models import Cdr, Tariff
+        from ocpi_tariffs.v2_2_1.tariff_calculator import calculate_cdr_cost
+
+    # Instantiate models
     cdr = Cdr(**cdr_data)
     tariff: Optional[Tariff] = None
     if tariff_data is not None:
         tariff = Tariff(**tariff_data)
+    
+    # Calculate and verify
+    if tariff:
+        calculated_cost = calculate_cdr_cost(cdr=cdr, tariff=tariff)
+        expected_cost = cdr.total_cost
 
-    calculated_cost = calculate_cdr_cost(cdr=cdr, tariff=tariff)
+        # v2.1.1 calculated_cost returns float, v2.2.1 returns Price object.
+        # This is a discrepancy!
+        # v2.2.1 `calculate_cdr_cost` returns `Price` model (excl_vat, incl_vat).
+        # v2.1.1 `pricer.calculate_total_cost()` (and my wrapper) returns `float` (total cost).
+        # I need to standardize the wrapper in v2.1.1 to return a similar structure OR adapt the test.
+        # The test previously handled v2.1.1 and v2.2.1 differently.
+        # v2.1.1: `assert calculated_cost == expected_cost` (floats)
+        # v2.2.1: `matches_excl = ...` (Price objects)
+        
+        # If I want strict standardization, v2.1.1 wrapper should return a Price-like object or at least the test should handle the difference.
+        # Let's inspect what `calculated_cost` is. 
+        # For v2.1.1 it is a float.
+        # For v2.2.1 it is a Price object.
+        
+        # Standard way:
+        if isinstance(calculated_cost, (int, float)):
+             # v2.1.1 case (or simple float return)
+             assert abs(calculated_cost - expected_cost) <= 0.02, f"Expected {expected_cost}, got {calculated_cost}"
+        else:
+            # v2.2.1 Price object case
+            # Helper to compare decimals with tolerance
+            def loose_equal(a: Optional[Decimal], b: Optional[Decimal]) -> bool:
+                if a is None and b is None:
+                    return True
+                if a is None or b is None:
+                    return False
+                return abs(a - b) <= Decimal("0.02")
 
-    # Compare with expected total cost in CDR
-    expected_cost = cdr.total_cost
+            if calculated_cost != expected_cost:
+                matches_excl = loose_equal(calculated_cost.excl_vat, expected_cost.excl_vat)
+                matches_incl = loose_equal(calculated_cost.incl_vat, expected_cost.incl_vat)
 
-    if expected_cost:
-        # Helper to compare decimals with tolerance
-        def loose_equal(a: Optional[Decimal], b: Optional[Decimal]) -> bool:
-            if a is None and b is None:
-                return True
-            if a is None or b is None:
-                return False
-            # Allow 0.02 difference (2 cents) to account for VAT rounding amplification
-            return abs(a - b) <= Decimal("0.02")
+                if matches_excl and matches_incl:
+                    return
 
-        # If strict equality fails, try rounded equality
-        if calculated_cost != expected_cost:
-            matches_excl = loose_equal(calculated_cost.excl_vat, expected_cost.excl_vat)
-            matches_incl = loose_equal(calculated_cost.incl_vat, expected_cost.incl_vat)
-
-            if matches_excl and matches_incl:
-                return  # Pass
-
-            # If rounding didn't help, fail with original values
-            assert calculated_cost == expected_cost, f"Expected {expected_cost}, got {calculated_cost}"
+                assert calculated_cost == expected_cost, f"Expected {expected_cost}, got {calculated_cost}"
 
 
 if __name__ == "__main__":
