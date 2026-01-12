@@ -1,0 +1,68 @@
+{
+    "id": "12345",
+    "start_date_time": "2015-06-29T21:39:09Z",
+    "end_date_time": "2015-06-29T23:37:32Z",
+    "auth_method": "WHITELIST",
+    "currency": "EUR",
+    "tariffs": [],
+    "charging_periods": [
+        {
+            "start_date_time": "2025-03-10T10:00:00Z",
+            "dimensions": [
+                {
+                    "type": "ENERGY",
+                    "volume": 1.0
+                },
+                {
+                    "type": "TIME",
+                    "volume": 0.2608
+                }
+            ]
+        },
+        {
+            "start_date_time": "2025-03-10T10:15:39Z",
+            "dimensions": [
+                {
+                    "type": "ENERGY",
+                    "volume": 14.342
+                },
+                {
+                    "type": "TIME",
+                    "volume": 3.7392
+                }
+            ]
+        },
+        {
+            "start_date_time": "2025-03-10T10:00:00Z",
+            "dimensions": [
+                {
+                    "type": "PARKING_TIME",
+                    "volume": 1.0
+                }
+            ]
+        },
+        {
+            "start_date_time": "2025-03-10T11:00:00Z",
+            "dimensions": [
+                {
+                    "type": "PARKING_TIME",
+                    "volume": 2.0
+                }
+            ]
+        },
+        {
+            "start_date_time": "2025-03-10T13:00:00Z",
+            "dimensions": [
+                {
+                    "type": "PARKING_TIME",
+                    "volume": 1.0
+                }
+            ]
+        }
+    ],
+    "total_cost": 9.868,
+    "total_energy": 15.342,
+    "total_time": 8,
+    "total_parking_time": 4,
+    "last_updated": "2015-06-29T22:01:13Z"
+}

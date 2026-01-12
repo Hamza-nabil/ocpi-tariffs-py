@@ -1,0 +1,23 @@
+{
+    "id": "cdr-gireve",
+    "currency": "EUR",
+    "charging_periods": [
+        {
+            "start_date_time": "2025-04-11T10:09:02Z",
+            "dimensions": [
+                {
+                    "volume": 11.765,
+                    "type": "ENERGY"
+                },
+                {
+                    "volume": 0.3364,
+                    "type": "TIME"
+                }
+            ]
+        }
+    ],
+    "total_cost": 5.91,
+    "total_energy": 11.765,
+    "total_time": 0.3575,
+    "total_parking_time": 0.0
+}

@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Dict, Optional
 from zoneinfo import ZoneInfo
 
-from .enums import CdrDimensionType, TariffDimensionType
+from ocpi_tariffs.core.enums import CdrDimensionType, TariffDimensionType
 from .models import Cdr, ChargingPeriod, Price, PriceComponent, Tariff, TariffElement, TariffRestrictions
 
 TIMEZONE_MAP = {

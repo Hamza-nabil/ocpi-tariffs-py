@@ -1,0 +1,18 @@
+{
+    "country_code": "DE",
+    "party_id": "ALL",
+    "id": "20",
+    "currency": "EUR",
+    "elements": [
+        {
+            "price_components": [
+                {
+                    "type": "SESSION_TIME",
+                    "price": 1,
+                    "step_size": 1
+                }
+            ]
+        }
+    ],
+    "last_updated": "2018-12-17T16:45:21Z"
+}

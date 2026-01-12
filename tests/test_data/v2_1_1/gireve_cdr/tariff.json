@@ -1,0 +1,24 @@
+{
+    "id": "gireve-tariff",
+    "currency": "EUR",
+    "elements": [
+        {
+            "price_components": [
+                {
+                    "price": 0.492,
+                    "price_round": {
+                        "round_rule": "ROUND_UP",
+                        "round_granularity": "HUNDREDTH"
+                    },
+                    "exact_price_component": true,
+                    "step_round": {
+                        "round_rule": "ROUND_UP",
+                        "round_granularity": "UNIT"
+                    },
+                    "step_size": 1000,
+                    "type": "ENERGY"
+                }
+            ]
+        }
+    ]
+}

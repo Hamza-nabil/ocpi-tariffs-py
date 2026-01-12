@@ -1,0 +1,62 @@
+from enum import Enum
+
+
+class RoundingGranularity(str, Enum):
+    UNIT = "UNIT"
+    TENTH = "TENTH"
+    HUNDREDTH = "HUNDREDTH"
+    THOUSANDTH = "THOUSANDTH"
+
+
+class RoundingRule(str, Enum):
+    ROUND_UP = "ROUND_UP"
+    ROUND_DOWN = "ROUND_DOWN"
+    ROUND_NEAR = "ROUND_NEAR"
+
+
+class DayOfWeek(str, Enum):
+    MONDAY = "MONDAY"
+    TUESDAY = "TUESDAY"
+    WEDNESDAY = "WEDNESDAY"
+    THURSDAY = "THURSDAY"
+    FRIDAY = "FRIDAY"
+    SATURDAY = "SATURDAY"
+    SUNDAY = "SUNDAY"
+
+
+class TariffDimensionType(str, Enum):
+    ENERGY = "ENERGY"
+    FLAT = "FLAT"
+    PARKING_TIME = "PARKING_TIME"
+    TIME = "TIME"
+    SESSION_TIME = "SESSION_TIME"
+
+
+class CdrDimensionType(str, Enum):
+    CURRENT = "CURRENT"
+    ENERGY = "ENERGY"
+    ENERGY_EXPORT = "ENERGY_EXPORT"
+    ENERGY_IMPORT = "ENERGY_IMPORT"
+    MAX_CURRENT = "MAX_CURRENT"
+    MIN_CURRENT = "MIN_CURRENT"
+    MAX_POWER = "MAX_POWER"
+    MIN_POWER = "MIN_POWER"
+    PARKING_TIME = "PARKING_TIME"
+    POWER = "POWER"
+    RESERVATION_TIME = "RESERVATION_TIME"
+    STATE_OF_CHARGE = "STATE_OF_CHARGE"
+    TIME = "TIME"
+
+
+class AuthMethod(str, Enum):
+    AUTH_REQUEST = "AUTH_REQUEST"
+    COMMAND = "COMMAND"
+    WHITELIST = "WHITELIST"
+
+
+class SessionStatus(str, Enum):
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    INVALID = "INVALID"
+    PENDING = "PENDING"
+    RESERVATION = "RESERVATION"

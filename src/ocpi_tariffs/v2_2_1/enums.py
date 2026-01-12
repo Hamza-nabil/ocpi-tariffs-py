@@ -1,38 +1,13 @@
-from enum import Enum
+from ocpi_tariffs.core.enums import (
+    AuthMethod,
+    CdrDimensionType,
+    SessionStatus,
+    TariffDimensionType,
+)
 
-
-class TariffDimensionType(str, Enum):
-    ENERGY = "ENERGY"
-    FLAT = "FLAT"
-    PARKING_TIME = "PARKING_TIME"
-    TIME = "TIME"
-
-
-class CdrDimensionType(str, Enum):
-    CURRENT = "CURRENT"
-    ENERGY = "ENERGY"
-    ENERGY_EXPORT = "ENERGY_EXPORT"
-    ENERGY_IMPORT = "ENERGY_IMPORT"
-    MAX_CURRENT = "MAX_CURRENT"
-    MIN_CURRENT = "MIN_CURRENT"
-    MAX_POWER = "MAX_POWER"
-    MIN_POWER = "MIN_POWER"
-    PARKING_TIME = "PARKING_TIME"
-    POWER = "POWER"
-    RESERVATION_TIME = "RESERVATION_TIME"
-    STATE_OF_CHARGE = "STATE_OF_CHARGE"
-    TIME = "TIME"
-
-
-class AuthMethod(str, Enum):
-    AUTH_REQUEST = "AUTH_REQUEST"
-    COMMAND = "COMMAND"
-    WHITELIST = "WHITELIST"
-
-
-class SessionStatus(str, Enum):
-    ACTIVE = "ACTIVE"
-    COMPLETED = "COMPLETED"
-    INVALID = "INVALID"
-    PENDING = "PENDING"
-    RESERVATION = "RESERVATION"
+__all__ = [
+    "AuthMethod",
+    "CdrDimensionType",
+    "SessionStatus",
+    "TariffDimensionType",
+]
